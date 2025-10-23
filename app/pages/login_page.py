@@ -30,6 +30,7 @@ def login_form() -> rx.Component:
             class_name="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500",
         ),
         on_submit=AuthState.login,
+        reset_on_submit=False,
         class_name="space-y-6",
     )
 
@@ -69,6 +70,7 @@ def register_form() -> rx.Component:
             class_name="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500",
         ),
         on_submit=AuthState.register,
+        reset_on_submit=False,
         class_name="space-y-6",
     )
 
