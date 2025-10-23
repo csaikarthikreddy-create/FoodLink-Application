@@ -50,8 +50,9 @@ class OrganizerState(rx.State):
                 query = text("""INSERT INTO event (organizer_id, name, location_address, latitude, longitude, 
                                        event_date, event_time, expected_surplus_kg, surplus_description, status)
                            VALUES (:organizer_id, :name, :location_address, :latitude, :longitude, 
-                                   :event_date, :event_time, :expected_surplus_kg, :surplus_description, :status)""")
-                session.exec(
+                                   :event_date, :event_time, :expected_surplus_kg, :surplus_description, :status)
+                           RETURNING id""")
+                result = session.exec(
                     query.bindparams(
                         organizer_id=auth_state.current_user_id,
                         name=form_data["name"],
@@ -64,7 +65,7 @@ class OrganizerState(rx.State):
                         surplus_description=form_data["surplus_description"],
                         status="Scheduled",
                     )
-                )
+                ).first()
                 session.commit()
             yield OrganizerState.toggle_create_modal
             yield OrganizerState.load_events
