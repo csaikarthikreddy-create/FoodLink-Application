@@ -67,8 +67,8 @@ class OrganizerState(rx.State):
                     )
                 ).first()
                 session.commit()
-            yield OrganizerState.toggle_create_modal
-            yield OrganizerState.load_events
+        self.show_create_modal = False
+        yield OrganizerState.load_events
 
     @rx.event
     async def set_status(self, event_id: int, status: str):
