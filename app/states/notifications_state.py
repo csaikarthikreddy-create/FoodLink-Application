@@ -2,6 +2,7 @@ import reflex as rx
 from sqlmodel import text
 import logging
 from app.states.ngo_state import haversine
+import datetime
 
 
 class NotificationsState(rx.State):
@@ -39,12 +40,13 @@ class NotificationsState(rx.State):
                         f"Mock notification to NGO {ngo_id} for event {event_id} via preferred channel."
                     )
                     session.exec(
-                        text("""INSERT INTO ngonotification (ngo_id, event_id, channel, status)
-                               VALUES (:ngo_id, :event_id, :channel, :status)""").bindparams(
+                        text("""INSERT INTO ngonotification (ngo_id, event_id, channel, status, created_at)
+                               VALUES (:ngo_id, :event_id, :channel, :status, :created_at)""").bindparams(
                             ngo_id=ngo_id,
                             event_id=event_id,
                             channel="log",
                             status="sent",
+                            created_at=str(datetime.datetime.utcnow()),
                         )
                     )
                 session.commit()

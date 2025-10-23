@@ -47,30 +47,30 @@ class OrganizerState(rx.State):
         auth_state = await self.get_state(AuthState)
         if auth_state.current_user_id:
             with rx.session() as session:
-                session.exec(
-                    text("""INSERT INTO event (organizer_id, name, location_address, latitude, longitude, 
+                query = text("""INSERT INTO event (organizer_id, name, location_address, latitude, longitude, 
                                        event_date, event_time, expected_surplus_kg, surplus_description, status)
                            VALUES (:organizer_id, :name, :location_address, :latitude, :longitude, 
-                                   :event_date, :event_time, :expected_surplus_kg, :surplus_description, :status)"""),
-                    {
-                        "organizer_id": auth_state.current_user_id,
-                        "name": form_data["name"],
-                        "location_address": form_data["location_address"],
-                        "latitude": float(form_data["latitude"]),
-                        "longitude": float(form_data["longitude"]),
-                        "event_date": form_data["event_date"],
-                        "event_time": form_data["event_time"],
-                        "expected_surplus_kg": float(form_data["expected_surplus_kg"]),
-                        "surplus_description": form_data["surplus_description"],
-                        "status": "Scheduled",
-                    },
+                                   :event_date, :event_time, :expected_surplus_kg, :surplus_description, :status)""")
+                session.exec(
+                    query.bindparams(
+                        organizer_id=auth_state.current_user_id,
+                        name=form_data["name"],
+                        location_address=form_data["location_address"],
+                        latitude=float(form_data["latitude"]),
+                        longitude=float(form_data["longitude"]),
+                        event_date=form_data["event_date"],
+                        event_time=form_data["event_time"],
+                        expected_surplus_kg=float(form_data["expected_surplus_kg"]),
+                        surplus_description=form_data["surplus_description"],
+                        status="Scheduled",
+                    )
                 )
                 session.commit()
-        yield OrganizerState.toggle_create_modal
-        yield OrganizerState.load_events
+            yield OrganizerState.toggle_create_modal
+            yield OrganizerState.load_events
 
     @rx.event
-    def set_status(self, event_id: int, status: str):
+    async def set_status(self, event_id: int, status: str):
         with rx.session() as session:
             session.exec(
                 text(
