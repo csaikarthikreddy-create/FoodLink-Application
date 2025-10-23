@@ -6,11 +6,13 @@ from app.db.models import User
 
 
 class AuthState(rx.State):
-    is_authenticated: bool = False
-    current_user_email: str = ""
-    current_user_role: Literal["organizer", "ngo", ""] = ""
-    current_user_name: str = ""
-    current_user_id: int | None = None
+    is_authenticated: bool = rx.LocalStorage(False, name="is_authenticated")
+    current_user_email: str = rx.LocalStorage("", name="current_user_email")
+    current_user_role: Literal["organizer", "ngo", ""] = rx.LocalStorage(
+        "", name="current_user_role"
+    )
+    current_user_name: str = rx.LocalStorage("", name="current_user_name")
+    current_user_id: int | None = rx.LocalStorage(None, name="current_user_id")
     error_message: str = ""
     show_login: bool = True
     form_role: str = "organizer"
@@ -110,6 +112,10 @@ class AuthState(rx.State):
         self.current_user_name = ""
         self.current_user_id = None
         return rx.redirect("/")
+
+    @rx.event
+    def initialize_auth_state(self):
+        pass
 
     @rx.var
     def initial(self) -> str:

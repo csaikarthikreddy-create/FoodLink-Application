@@ -9,15 +9,18 @@ from app.pages.map_page import map_page
 
 
 def index() -> rx.Component:
-    return rx.cond(
-        AuthState.is_authenticated,
-        rx.match(
-            AuthState.current_user_role,
-            ("organizer", organizer_dashboard()),
-            ("ngo", ngo_dashboard()),
+    return rx.el.div(
+        rx.cond(
+            AuthState.is_authenticated,
+            rx.match(
+                AuthState.current_user_role,
+                ("organizer", organizer_dashboard()),
+                ("ngo", ngo_dashboard()),
+                login_page(),
+            ),
             login_page(),
         ),
-        login_page(),
+        on_mount=AuthState.initialize_auth_state,
     )
 
 
