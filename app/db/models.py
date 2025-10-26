@@ -49,3 +49,4 @@ class NGONotification(TypedDict):
     channel: str
     status: str
     created_at: str
+    error_message: str | None

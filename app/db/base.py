@@ -61,5 +61,6 @@ class NGONotification(SQLModel, table=True):
     channel: str
     status: str
     created_at: str
+    error_message: Optional[str] = Field(default=None)
     ngo: NGO = Relationship(back_populates="notifications")
     event: Event = Relationship(back_populates="notifications")
