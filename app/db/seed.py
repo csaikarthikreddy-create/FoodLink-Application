@@ -158,6 +158,17 @@ def main():
         session.add_all([event1, event2, event3, event4, event5])
         session.commit()
         print("Database seeded successfully!")
+        session.add_all([event1, event2, event3, event4, event5])
+        session.commit()
+        for ngo in [ngo1, ngo2, ngo3]:
+            ngo_user = session.get(User, ngo.user_id)
+            if ngo_user:
+                pref = NGONotificationPreferences(
+                    ngo_id=ngo.id, channel="email", contact_info=ngo_user.email
+                )
+                session.add(pref)
+        session.commit()
+        print("Database seeded successfully!")
 
 
 if __name__ == "__main__":

@@ -1,6 +1,5 @@
 import os
 import logging
-from twilio.rest import Client
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 from sendgrid import SendGridAPIClient
@@ -9,14 +8,6 @@ from sendgrid.helpers.mail import Mail
 
 class NotificationService:
     def __init__(self):
-        self.twilio_sid = os.getenv(
-            "TWILIO_ACCOUNT_SID", "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        )
-        self.twilio_token = os.getenv("TWILIO_AUTH_TOKEN", "your_auth_token")
-        self.twilio_whatsapp_from = os.getenv(
-            "TWILIO_WHATSAPP_NUMBER", "whatsapp:+14155238886"
-        )
-        self.twilio_client = Client(self.twilio_sid, self.twilio_token)
         self.slack_token = os.getenv("SLACK_BOT_TOKEN", "xoxb-your-token")
         self.slack_client = WebClient(token=self.slack_token)
         self.sendgrid_api_key = os.getenv("SENDGRID_API_KEY", "SG.xxxxxxxx")
@@ -26,28 +17,12 @@ class NotificationService:
     def send_notification(
         self, channel: str, recipient: str, event_data: dict, ngo_data: dict
     ):
-        if channel == "whatsapp":
-            self.send_whatsapp(recipient, event_data)
-        elif channel == "slack":
+        if channel == "slack":
             self.send_slack(recipient, event_data, ngo_data)
         elif channel == "email":
             self.send_email(recipient, event_data, ngo_data)
         else:
-            raise ValueError(f"Unsupported notification channel: {channel}")
-
-    def _get_whatsapp_template(self, event: dict) -> str:
-        return f"*New Food Surplus Alert from FoodLink!*\n\n*Event:* {event['name']}\n*Location:* {event['location_address']}\n*Surplus:* {event['expected_surplus_kg']} kg of {event['surplus_description']}\n*Organizer:* {event['organizer_name']}\n*Contact:* {event['organizer_phone']}\n\nPlease contact the organizer directly to coordinate pickup."
-
-    def send_whatsapp(self, to_number: str, event_data: dict):
-        body = self._get_whatsapp_template(event_data)
-        try:
-            message = self.twilio_client.messages.create(
-                from_=self.twilio_whatsapp_from, body=body, to=f"whatsapp:{to_number}"
-            )
-            logging.info(f"WhatsApp message sent to {to_number}, SID: {message.sid}")
-        except Exception as e:
-            logging.exception(f"Failed to send WhatsApp to {to_number}: {e}")
-            raise
+            logging.warning(f"Unsupported or disabled notification channel: {channel}")
 
     def _get_slack_template(self, event: dict, ngo: dict) -> list[dict]:
         return [
